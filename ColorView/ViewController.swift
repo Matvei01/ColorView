@@ -25,40 +25,53 @@ class ViewController: UIViewController {
         
         colorView.layer.cornerRadius = 15
         
-        setValue()
+        setValue(for: redLable, greenLabel, blueLabel)
         
         setColor()
         
         redSlider.minimumTrackTintColor = .red
         greenSlider.minimumTrackTintColor = .green
-        
     }
 
     @IBAction func sliderColorChanged(_ sender: UISlider) {
-        setValue()
-        
         setColor()
         
+        switch sender {
+        case redSlider:
+            redLable.text = string(from: redSlider)
+        case greenSlider:
+            greenLabel.text = string(from: greenSlider)
+        default:
+            blueLabel.text = string(from: blueSlider)
+        }
     }
     
-}
-
-// MARK: - Private methods
-extension ViewController {
     private func setColor() {
         colorView.backgroundColor = UIColor(
             red: CGFloat(redSlider.value),
             green: CGFloat(greenSlider.value),
             blue: CGFloat(blueSlider.value),
             alpha: 1)
-        
+        }
+    
+    private func setValue(for labels: UILabel...) {
+        labels.forEach { label in
+            switch label {
+            case redLable:
+                redLable.text = string(from: redSlider)
+            case greenLabel:
+                greenLabel.text = string(from: greenSlider)
+            default:
+                blueLabel.text = string(from: blueSlider)
+            }
+        }
     }
     
-    private func setValue() {
-        redLable.text = String(format: "%.2f", redSlider.value)
-        greenLabel.text = String(format: "%.2f", greenSlider.value)
-        blueLabel.text = String(format: "%.2f", blueSlider.value)
-        
+    private func string(from slider: UISlider) -> String {
+        String(format: "%.2f", slider.value)
     }
-    
 }
+
+    
+    
+
