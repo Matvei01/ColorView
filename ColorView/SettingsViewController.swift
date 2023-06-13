@@ -12,7 +12,7 @@ class SettingsViewController: UIViewController {
     // MARK: - IB Outlets
     @IBOutlet weak var colorView: UIView!
     
-    @IBOutlet weak var redLable: UILabel!
+    @IBOutlet weak var redLabel: UILabel!
     @IBOutlet weak var greenLabel: UILabel!
     @IBOutlet weak var blueLabel: UILabel!
     
@@ -42,7 +42,7 @@ class SettingsViewController: UIViewController {
         
         setSliders()
         
-        setValue(for: redLable, greenLabel, blueLabel)
+        setValue(for: redLabel, greenLabel, blueLabel)
         
         setValue(for: redTextField,greenTextField, blueTextField)
         
@@ -55,7 +55,7 @@ class SettingsViewController: UIViewController {
     @IBAction func sliderColorChanged(_ sender: UISlider) {
         switch sender {
         case redSlider:
-            setValue(for: redLable)
+            setValue(for: redLabel)
             setValue(for: redTextField)
         case greenSlider:
             setValue(for: greenLabel)
@@ -82,13 +82,13 @@ extension SettingsViewController {
             green: CGFloat(greenSlider.value),
             blue: CGFloat(blueSlider.value),
             alpha: 1)
-        }
+    }
     
     private func setValue(for labels: UILabel...) {
         labels.forEach { label in
             switch label {
-            case redLable:
-                redLable.text = string(from: redSlider)
+            case redLabel:
+                redLabel.text = string(from: redSlider)
             case greenLabel:
                 greenLabel.text = string(from: greenSlider)
             default:
@@ -146,7 +146,7 @@ extension SettingsViewController: UITextFieldDelegate {
             switch textField {
             case redTextField:
                 redSlider.setValue(currentValue, animated: true)
-                setValue(for: redLable)
+                setValue(for: redLabel)
             case greenTextField:
                 greenSlider.setValue(currentValue, animated: true)
                 setValue(for: greenLabel)
@@ -183,6 +183,6 @@ extension SettingsViewController: UITextFieldDelegate {
     }
 }
 
-    
-    
+
+
 
