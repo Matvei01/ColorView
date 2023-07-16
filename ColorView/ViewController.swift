@@ -247,7 +247,9 @@ class ViewController: UIViewController {
     private func setConstraintsForLabelStackView(_ stackView: UIStackView, constant: CGFloat) {
         NSLayoutConstraint.activate(
             [
-                stackView.widthAnchor.constraint(equalToConstant: constant)
+                stackView.widthAnchor.constraint(
+                    equalToConstant: constant
+                )
             ]
         )
     }
@@ -255,9 +257,18 @@ class ViewController: UIViewController {
     private func setConstraintsForMainStackView() {
         NSLayoutConstraint.activate(
             [
-                mainStackView.topAnchor.constraint(equalTo: colorView.bottomAnchor, constant: 53),
-                mainStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-                mainStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
+                mainStackView.topAnchor.constraint(
+                    equalTo: colorView.bottomAnchor,
+                    constant: 53
+                ),
+                mainStackView.leadingAnchor.constraint(
+                    equalTo: view.safeAreaLayoutGuide.leadingAnchor,
+                    constant: 16
+                ),
+                mainStackView.trailingAnchor.constraint(
+                    equalTo: view.safeAreaLayoutGuide.trailingAnchor,
+                    constant: -16
+                )
             ]
         )
     }
