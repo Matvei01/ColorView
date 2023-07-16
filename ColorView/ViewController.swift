@@ -31,7 +31,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .lightGray
+        view.backgroundColor = .white
         
         setupSubviews()
         
@@ -136,9 +136,17 @@ class ViewController: UIViewController {
         redSlider.minimumTrackTintColor = .red
         greenSlider.minimumTrackTintColor = .green
         
+        setColorForThumbs(redSlider, greenSlider, blueSlider)
+        
         redSlider.addTarget(self, action: #selector(redSliderColorChanged), for: .valueChanged)
         greenSlider.addTarget(self, action: #selector(greenSliderColorChanged), for: .valueChanged)
         blueSlider.addTarget(self, action: #selector(blueSliderColorChanged), for: .valueChanged)
+    }
+    
+    private func setColorForThumbs(_ sliders: UISlider...) {
+        for slider in sliders {
+            slider.thumbTintColor = .lightGray
+        }
     }
     
     @objc private func redSliderColorChanged(slider: UISlider) {
@@ -231,7 +239,7 @@ class ViewController: UIViewController {
                 ),
                 colorView.heightAnchor.constraint(
                     equalToConstant: 128
-                ),
+                )
             ]
         )
     }
