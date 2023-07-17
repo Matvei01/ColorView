@@ -138,9 +138,7 @@ class ViewController: UIViewController {
         
         setColorForThumbs(redSlider, greenSlider, blueSlider)
         
-        redSlider.addTarget(self, action: #selector(redSliderColorChanged), for: .valueChanged)
-        greenSlider.addTarget(self, action: #selector(greenSliderColorChanged), for: .valueChanged)
-        blueSlider.addTarget(self, action: #selector(blueSliderColorChanged), for: .valueChanged)
+        addTarget(redSlider, greenSlider, blueSlider)
     }
     
     private func setColorForThumbs(_ sliders: UISlider...) {
@@ -149,22 +147,14 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc private func redSliderColorChanged(slider: UISlider) {
-        setColor()
-        sliderColorChanged(redSlider)
+    private func addTarget(_ sliders: UISlider...) {
+        for slider in sliders {
+            slider.addTarget(self, action: #selector(sliderColorChanged), for: .valueChanged)
+        }
     }
     
-    @objc private func greenSliderColorChanged() {
+    @objc private func sliderColorChanged(_ slider: UISlider) {
         setColor()
-        sliderColorChanged(greenSlider)
-    }
-    
-    @objc private func blueSliderColorChanged() {
-        setColor()
-        sliderColorChanged(blueSlider)
-    }
-    
-    private func sliderColorChanged(_ slider: UISlider) {
         
         switch slider {
         case redSlider:
@@ -176,25 +166,37 @@ class ViewController: UIViewController {
         }
     }
     
-    private func secondaryStackViewLayouts(_ stackView: UIStackView, spacing: CGFloat) {
-        stackView.axis = .vertical
-        stackView.alignment = .fill
-        stackView.distribution = .fill
-        stackView.spacing = spacing
-    }
-    
-    private func mainStackViewLayouts() {
-        mainStackView.axis = .horizontal
-        mainStackView.alignment = .center
-        mainStackView.distribution = .fill
-        mainStackView.spacing = 8
+    private func stackViewsLayouts(_ stackViews: UIStackView...) {
+        for stackView in stackViews {
+            
+            switch stackView {
+            case stackViewForColorLabels, stackViewForValueLabels:
+                stackView.axis = .vertical
+                stackView.alignment = .fill
+                stackView.distribution = .fill
+                stackView.spacing = 25
+            case stackViewForSliders:
+                stackView.axis = .vertical
+                stackView.alignment = .fill
+                stackView.distribution = .fill
+                stackView.spacing = 12
+            default:
+                stackView.axis = .horizontal
+                stackView.alignment = .center
+                stackView.distribution = .fill
+                stackView.spacing = 8
+            }
+        }
     }
     
     private func stackViewsConfigure() {
-        secondaryStackViewLayouts(stackViewForColorLabels, spacing: 25)
-        secondaryStackViewLayouts(stackViewForValueLabels, spacing: 25)
-        secondaryStackViewLayouts(stackViewForSliders, spacing: 12)
-        mainStackViewLayouts()
+        
+        stackViewsLayouts(
+            stackViewForColorLabels,
+            stackViewForValueLabels,
+            stackViewForSliders,
+            mainStackView
+        )
         
         stackViewForColorLabels.translatesAutoresizingMaskIntoConstraints = false
         stackViewForValueLabels.translatesAutoresizingMaskIntoConstraints = false
