@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  ColorViewController.swift
 //  ColorView
 //
 //  Created by Matvei Khlestov on 15.07.2023.
@@ -7,8 +7,13 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ColorViewController: UIViewController {
     
+    // MARK: - Public Properties
+    var delegate: ColorViewControllerDelegate!
+    var viewColor: UIColor!
+    
+    // MARK: - Private Properties
     private let colorView = UIView()
     
     private let redColorLabel = UILabel()
@@ -19,6 +24,11 @@ class ViewController: UIViewController {
     private let greenValueLabel = UILabel()
     private let blueValueLabel = UILabel()
     
+    private let redTextField = UITextField()
+    private let greenTextField = UITextField()
+    private let blueTextField = UITextField()
+    
+    private let doneButton = UIButton()
     
     private let redSlider = UISlider()
     private let greenSlider = UISlider()
@@ -27,17 +37,22 @@ class ViewController: UIViewController {
     private let stackViewForColorLabels = UIStackView()
     private let stackViewForValueLabels = UIStackView()
     private let stackViewForSliders = UIStackView()
+    private let stackViewForTextFields = UIStackView()
     private let mainStackView = UIStackView()
     
+    // MARK: - Life cycle Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
+        configure()
+    }
+}
+
+// MARK: - Private Methods
+extension ColorViewController {
+    private func configure() {
+        view.backgroundColor = UIColor(named: "viewColor")
         
         setupSubviews()
-        
-        setColor()
-        
-        setValue(for: redValueLabel, greenValueLabel, blueValueLabel)
         
         colorViewConfigure()
         
@@ -45,7 +60,15 @@ class ViewController: UIViewController {
         
         slidersConfigure()
         
+        textFieldsConfigure()
+        
         stackViewsConfigure()
+        
+        doneButtonConfigure()
+        
+        setSliders()
+        setValue(for: redValueLabel, greenValueLabel, blueValueLabel)
+        setValue(for: redTextField, greenTextField, blueTextField)
     }
     
     private func setupSubviews(_ subviews: UIView...) {
@@ -57,22 +80,33 @@ class ViewController: UIViewController {
     private func setupSubviews() {
         setupSubviews(
             colorView,
-            redColorLabel,
-            greenColorLabel,
-            blueColorLabel,
-            redValueLabel,
-            greenValueLabel,
-            blueValueLabel,
-            redSlider,
-            greenSlider,
-            blueSlider,
+            mainStackView,
+            doneButton
+        )
+        
+        setupSubviewsFor(
             stackViewForColorLabels,
+            subviews: redColorLabel, greenColorLabel, blueColorLabel
+        )
+        setupSubviewsFor(
+            stackViewForValueLabels,
+            subviews: redValueLabel, greenValueLabel, blueValueLabel
+        )
+        setupSubviewsFor(
             stackViewForSliders,
-            mainStackView
+            subviews: redSlider, greenSlider, blueSlider
+        )
+        setupSubviewsFor(
+            stackViewForTextFields,
+            subviews: redTextField, greenTextField, blueTextField)
+        
+        setupSubviewsFor(
+            mainStackView,
+            subviews: stackViewForColorLabels, stackViewForValueLabels, stackViewForSliders, stackViewForTextFields
         )
     }
     
-    private func setupSubviews(stackView: UIStackView, subviews: UIView...) {
+    private func setupSubviewsFor(_ stackView: UIStackView, subviews: UIView...) {
         for subview in subviews {
             stackView.addArrangedSubview(subview)
         }
@@ -101,12 +135,26 @@ class ViewController: UIViewController {
         }
     }
     
+    private func setValue(for textFields: UITextField...) {
+        for textField in textFields {
+            switch textField {
+            case redTextField:
+                textField.text = string(from: redSlider)
+            case greenTextField:
+                textField.text = string(from: greenSlider)
+            default:
+                textField.text = string(from: blueSlider)
+            }
+        }
+    }
+    
     private func string(from slider: UISlider) -> String {
         String(format: "%.2f", slider.value)
     }
     
     private func colorViewConfigure() {
         colorView.layer.cornerRadius = 15
+        colorView.backgroundColor = viewColor
         colorView.translatesAutoresizingMaskIntoConstraints = false
         setConstraintsForColorView()
     }
@@ -116,7 +164,7 @@ class ViewController: UIViewController {
         greenColorLabel.text = "Green"
         blueColorLabel.text = "Blue"
         
-        setFontForLabels(
+        setupConfiguresFor(
             redColorLabel,
             greenColorLabel,
             blueColorLabel,
@@ -126,9 +174,20 @@ class ViewController: UIViewController {
         )
     }
     
-    private func setFontForLabels(_ labels: UILabel...) {
+    private func setupConfiguresFor(_ labels: UILabel...) {
         for label in labels {
-            label.font = .systemFont(ofSize: 14)
+            label.font = .systemFont(ofSize: 17)
+            label.textColor = .white
+            label.adjustsFontSizeToFitWidth = true
+        }
+    }
+    
+    private func setupConfiguresFor(_ textFields: UITextField...) {
+        for textField in textFields {
+            textField.font = .systemFont(ofSize: 17)
+            textField.borderStyle = .roundedRect
+            textField.placeholder = "1.00"
+            textField.adjustsFontSizeToFitWidth = true
         }
     }
     
@@ -136,15 +195,14 @@ class ViewController: UIViewController {
         redSlider.minimumTrackTintColor = .red
         greenSlider.minimumTrackTintColor = .green
         
-        setColorForThumbs(redSlider, greenSlider, blueSlider)
-        
         addTarget(redSlider, greenSlider, blueSlider)
     }
     
-    private func setColorForThumbs(_ sliders: UISlider...) {
-        for slider in sliders {
-            slider.thumbTintColor = .lightGray
-        }
+    private func setSliders() {
+        let ciColor = CIColor(color: viewColor)
+        redSlider.value = Float(ciColor.red)
+        greenSlider.value = Float(ciColor.green)
+        blueSlider.value = Float(ciColor.blue)
     }
     
     private func addTarget(_ sliders: UISlider...) {
@@ -154,16 +212,43 @@ class ViewController: UIViewController {
     }
     
     @objc private func sliderColorChanged(_ slider: UISlider) {
-        setColor()
         
         switch slider {
         case redSlider:
             setValue(for: redValueLabel)
+            setValue(for: redTextField)
         case greenSlider:
             setValue(for: greenValueLabel)
+            setValue(for: greenTextField)
         default:
             setValue(for: blueValueLabel)
+            setValue(for: blueTextField)
         }
+        
+        setColor()
+    }
+    
+    private func textFieldsConfigure() {
+        setupConfiguresFor(
+            redTextField,
+            greenTextField,
+            blueTextField
+        )
+    }
+    
+    private func doneButtonConfigure() {
+        doneButton.setTitle("Done", for: .normal)
+        doneButton.titleLabel?.font = .systemFont(ofSize: 30)
+        doneButton.titleLabel?.textColor = .white
+        doneButton.addTarget(self, action: #selector(doneButtonPressed), for: .touchUpInside)
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        setConstraintsForDoneButton()
+    }
+    
+    @objc private func doneButtonPressed() {
+        delegate?.setColor(colorView.backgroundColor ?? .white)
+        dismiss(animated: true)
     }
     
     private func stackViewsLayouts(_ stackViews: UIStackView...) {
@@ -180,6 +265,11 @@ class ViewController: UIViewController {
                 stackView.alignment = .fill
                 stackView.distribution = .fill
                 stackView.spacing = 12
+            case stackViewForTextFields:
+                stackView.axis = .vertical
+                stackView.alignment = .fill
+                stackView.distribution = .fill
+                stackView.spacing = 10
             default:
                 stackView.axis = .horizontal
                 stackView.alignment = .center
@@ -190,40 +280,28 @@ class ViewController: UIViewController {
     }
     
     private func stackViewsConfigure() {
-        
         stackViewsLayouts(
             stackViewForColorLabels,
             stackViewForValueLabels,
             stackViewForSliders,
+            stackViewForTextFields,
             mainStackView
         )
         
         stackViewForColorLabels.translatesAutoresizingMaskIntoConstraints = false
         stackViewForValueLabels.translatesAutoresizingMaskIntoConstraints = false
+        stackViewForTextFields.translatesAutoresizingMaskIntoConstraints = false
         mainStackView.translatesAutoresizingMaskIntoConstraints = false
         
-        setConstraintsForLabelStackView(stackViewForColorLabels, constant: 44)
-        setConstraintsForLabelStackView(stackViewForValueLabels, constant: 30)
+        setConstraintsFor(stackViewForColorLabels, constant: 44)
+        setConstraintsFor(stackViewForValueLabels, constant: 30)
+        setConstraintsFor(stackViewForTextFields, constant: 50)
         setConstraintsForMainStackView()
-        
-        setupSubviews(
-            stackView: stackViewForColorLabels,
-            subviews: redColorLabel, greenColorLabel, blueColorLabel
-        )
-        setupSubviews(
-            stackView: stackViewForValueLabels,
-            subviews: redValueLabel, greenValueLabel, blueValueLabel
-        )
-        setupSubviews(
-            stackView: stackViewForSliders,
-            subviews: redSlider, greenSlider, blueSlider
-        )
-        setupSubviews(
-            stackView: mainStackView,
-            subviews: stackViewForColorLabels, stackViewForValueLabels, stackViewForSliders
-        )
     }
-    
+}
+
+// MARK: - Constraints
+extension ColorViewController {
     private func setConstraintsForColorView() {
         NSLayoutConstraint.activate(
             [
@@ -246,7 +324,7 @@ class ViewController: UIViewController {
         )
     }
     
-    private func setConstraintsForLabelStackView(_ stackView: UIStackView, constant: CGFloat) {
+    private func setConstraintsFor(_ stackView: UIStackView, constant: CGFloat) {
         NSLayoutConstraint.activate(
             [
                 stackView.widthAnchor.constraint(
@@ -270,6 +348,20 @@ class ViewController: UIViewController {
                 mainStackView.trailingAnchor.constraint(
                     equalTo: view.safeAreaLayoutGuide.trailingAnchor,
                     constant: -16
+                )
+            ]
+        )
+    }
+    
+    private func setConstraintsForDoneButton() {
+        NSLayoutConstraint.activate(
+            [
+                doneButton.centerXAnchor.constraint(
+                    equalTo: view.centerXAnchor
+                ),
+                doneButton.bottomAnchor.constraint(
+                    equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                    constant: -53
                 )
             ]
         )
